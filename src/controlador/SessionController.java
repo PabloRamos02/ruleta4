@@ -12,9 +12,9 @@ public class SessionController {
     }
 
     public void registrarUsuario(String username, String password, String nombre) {
-        if (username == null || username.isBlank() ||
-                password == null || password.isBlank() ||
-                nombre == null || nombre.isBlank()) {
+        if (username == null || username.trim().isEmpty() ||
+                password == null || password.trim().isEmpty() ||
+                nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("Todos los datos son requeridos");
         }
 

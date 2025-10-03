@@ -47,12 +47,18 @@ public class Ruleta {
     private boolean evaluarResultado(int numero, TipoApuesta tipo) {
         if (numero == 0) return false;
 
-        return switch (tipo) {
-            case ROJO -> esRojo(numero);
-            case NEGRO -> !esRojo(numero);
-            case PAR -> numero % 2 == 0;
-            case IMPAR -> numero % 2 != 0;
-        };
+        switch (tipo) {
+            case ROJO:
+                return esRojo(numero);
+            case NEGRO:
+                return !esRojo(numero);
+            case PAR:
+                return numero % 2 == 0;
+            case IMPAR:
+                return numero % 2 != 0;
+            default:
+                return false;
+        }
     }
 
     private boolean esRojo(int numero) {
