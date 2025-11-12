@@ -1,17 +1,21 @@
 package modelo;
 
+import java.util.List;
+
 public class Ruleta {
     private int saldo;
+    private IRepositorioResultados repositorio;
 
-    public Ruleta(int saldoInicial) {
+    public Ruleta(int saldoInicial, IRepositorioResultados repositorio) {
         if (saldoInicial < 0) {
             throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
         }
         this.saldo = saldoInicial;
+        this.repositorio = repositorio;
     }
 
-    public Ruleta() {
-        this(0);
+    public Ruleta(IRepositorioResultados repositorio) {
+        this(0, repositorio);
     }
 
     public int getSaldo() { return saldo; }
@@ -23,18 +27,24 @@ public class Ruleta {
         this.saldo += monto;
     }
 
-    public boolean apostar(int monto, TipoApuesta tipo) {
-        if (monto <= 0 || monto > saldo) {
+    public boolean apostar(ApuestaBase apuesta) {
+        if (apuesta.getMonto() <= 0 || apuesta.getMonto() > saldo) {
             return false;
         }
 
         int numero = generarNumero();
-        boolean gana = evaluarResultado(numero, tipo);
+        String color = determinarColor(numero);
+        boolean gana = apuesta.acierta(numero, color);
 
+
+        Resultado resultado = new Resultado(numero, color, gana, apuesta.getMonto(), apuesta.getEtiqueta());
+        repositorio.guardarResultado(resultado);
+
+        
         if (gana) {
-            saldo += monto;
+            saldo += apuesta.getMonto(); 
         } else {
-            saldo -= monto;
+            saldo -= apuesta.getMonto();
         }
 
         return gana;
@@ -44,28 +54,17 @@ public class Ruleta {
         return (int) (Math.random() * 37);
     }
 
-    private boolean evaluarResultado(int numero, TipoApuesta tipo) {
-        if (numero == 0) return false;
-
-        switch (tipo) {
-            case ROJO:
-                return esRojo(numero);
-            case NEGRO:
-                return !esRojo(numero);
-            case PAR:
-                return numero % 2 == 0;
-            case IMPAR:
-                return numero % 2 != 0;
-            default:
-                return false;
-        }
+    private String determinarColor(int numero) {
+        if (numero == 0) return "VERDE";
+        ApuestaRojo apuestaRojo = new ApuestaRojo(0);
+        return apuestaRojo.acierta(numero, "") ? "ROJO" : "NEGRO";
     }
 
-    private boolean esRojo(int numero) {
-        int[] rojos = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
-        for (int rojo : rojos) {
-            if (rojo == numero) return true;
-        }
-        return false;
+    public Estadisticas obtenerEstadisticas() {
+        return new Estadisticas(repositorio.obtenerHistorial());
     }
+    public List<Resultado> obtenerHistorialCompleto() {
+    return repositorio.obtenerHistorial();
+    }
+
 }

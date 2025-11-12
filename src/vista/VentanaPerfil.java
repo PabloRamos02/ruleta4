@@ -29,7 +29,7 @@ public class VentanaPerfil {
         JButton btnRecargar = new JButton("Recargar Saldo");
         JButton btnCerrar = new JButton("Cerrar");
 
-        txtUsername.setEditable(false); // Usuario no editable
+        txtUsername.setEditable(false); 
 
         dialog.add(new JLabel("Nombre:"));
         dialog.add(txtNombre);
